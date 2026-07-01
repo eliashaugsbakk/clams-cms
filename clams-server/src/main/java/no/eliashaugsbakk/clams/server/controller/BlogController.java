@@ -2,11 +2,13 @@ package no.eliashaugsbakk.clams.server.controller;
 
 import io.javalin.http.Context;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import no.eliashaugsbakk.clams.server.repository.BlogPostRepo;
 import no.eliashaugsbakk.clams.server.repository.BlogPostRepoSqlite;
 import no.eliashaugsbakk.clams.server.repository.SqliteManager;
+import no.eliashaugsbakk.clams.server.utils.MarkdownConverter;
 
 public class BlogController {
   private final BlogPostRepo blogPostRepo;
@@ -16,10 +18,17 @@ public class BlogController {
   }
 
   public void handleGetPost(Context ctx) {
-    ctx.render("templates/post.html",
-        Map.of("page_title", "place holder Title - Elias Haugsbakk", "page_css", "post",
-            "title", "place holder Title", "published_date", "place holder Release Date",
-            "author", "place holder Author", "content", "place holder Content"));
+    blogPostRepo.getPost(ctx.pathParam("slug")).ifPresentOrElse(post -> ctx.render(
+        "templates/post.html",
+        Map.of("page_title", post.title() + " -- Elias Haugsbakk",
+            "page_css", "post",
+            "title", post.title(),
+            "published_date", post.timePublished().atZone(ZoneId.of("Europe/Oslo")).format(
+                DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+            "author", "by Elias Haugsbakk",
+            "content", MarkdownConverter.convertToHtml(post.content()),
+            "back_to_index", "<a href=\"/blog/\">back to all posts</a>"
+        )), () -> ctx.status(404));
   }
 
   public void handleGetOverview(Context ctx) {
@@ -64,17 +73,16 @@ public class BlogController {
     featuredPosts.append("<ul class=\"recent-list\">");
 
     for (String slug : featuredSlugs) {
-      blogPostRepo.getPost(slug).ifPresent(post -> featuredPosts.append(
-          String.format("""
-              <li>
-                <a href="/blog/%s">%s</a> <span class="featured-desc">-- %s</span>
-              </li>
-              """, post.slug(), post.title(), post.summary())));
+      blogPostRepo.getPost(slug).ifPresent(post -> featuredPosts.append(String.format("""
+          <li>
+            <a href="/blog/%s">%s</a> <span class="featured-desc">-- %s</span>
+          </li>
+          """, post.slug(), post.title(), post.summary())));
     }
     featuredPosts.append("</ul>");
 
     ctx.render("templates/blog.html",
-        Map.of("page_title", "Elias Haugsbakk's Blog", "page_css", "blog",
-            "all_posts", allPosts.toString(), "recent_posts", featuredPosts.toString()));
+        Map.of("page_title", "Elias Haugsbakk's Blog", "page_css", "blog", "all_posts",
+            allPosts.toString(), "recent_posts", featuredPosts.toString()));
   }
 }

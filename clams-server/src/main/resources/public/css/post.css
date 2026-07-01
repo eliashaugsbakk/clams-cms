@@ -17,22 +17,18 @@
     margin-bottom: 1.5rem;
 }
 
-.post-image {
+.post-content p:has(img) {
     margin: 40px 0;
     text-align: center;
 }
 
-.post-image img {
-    max-width: 100%;
+.post-content img {
+    width: 100%;
+    max-width: 550px;
     height: auto;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-}
-
-.post-image figcaption {
-    margin-top: 10px;
-    font-size: 0.85rem;
-    opacity: 0.7;
+    display: inline-block;
 }
 
 .post-nav {
