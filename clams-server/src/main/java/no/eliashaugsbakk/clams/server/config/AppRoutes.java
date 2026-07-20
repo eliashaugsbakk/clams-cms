@@ -1,14 +1,20 @@
 package no.eliashaugsbakk.clams.server.config;
 
-import static io.javalin.apibuilder.ApiBuilder.*;
+import static io.javalin.apibuilder.ApiBuilder.before;
+import static io.javalin.apibuilder.ApiBuilder.delete;
+import static io.javalin.apibuilder.ApiBuilder.get;
+import static io.javalin.apibuilder.ApiBuilder.path;
+import static io.javalin.apibuilder.ApiBuilder.post;
+import static io.javalin.apibuilder.ApiBuilder.put;
+
 import io.javalin.apibuilder.EndpointGroup;
 import java.util.Map;
 
 public class AppRoutes implements EndpointGroup {
-  private final AppContext ctx;
+  private final AppContext appContext;
 
-  public AppRoutes(AppContext ctx) {
-    this.ctx = ctx;
+  public AppRoutes(AppContext appContext) {
+    this.appContext = appContext;
   }
 
   @Override
@@ -20,19 +26,38 @@ public class AppRoutes implements EndpointGroup {
         Map.of("page_title", "Projects - Elias Haugsbakk", "page_css", "projects")));
 
     path("blog", () -> {
-      get(ctx.getBlogController()::handleBlogRequest);
-      get("{slug}", ctx.getBlogController()::handleGetPost);
+      get(appContext.getBlogController()::handleBlogRequest);
+      get("{slug}", appContext.getBlogController()::handleGetPost);
     });
 
     path("api", () -> {
-      post("posts", ctx.getPostController()::handlePostPost);
-      put("posts/{slug}", ctx.getPostController()::handlePutPost);
-      delete("posts/{slug}", ctx.getPostController()::handleDeletePost);
+      before("*", ctx -> {
+        String authHeader = ctx.header("Authorization");
 
-      get("media", ctx.getMediaController()::handleGetMediaIndex);
-      get("media/{uuid}", ctx.getMediaController()::handleGetMedia);
-      post("media", ctx.getMediaController()::handlePostMedia);
-      delete("media/{uuid}", ctx.getMediaController()::handleDeleteMedia);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+          ctx.status(401).json(Map.of("error", "Unauthorized",
+              "message", "Missing or malformed Authorization header."));
+          ctx.skipRemainingHandlers();
+          return;
+        }
+
+        String token = authHeader.substring(7).trim();
+        if (!appContext.getAuthService().isValid(token)) {
+          ctx.status(403)
+              .json(Map.of("error", "Forbidden",
+                  "message", "Invalid API validation token."));
+          ctx.skipRemainingHandlers();
+        }
+      });
+
+      post("posts", appContext.getPostController()::handlePostPost);
+      put("posts/{slug}", appContext.getPostController()::handlePutPost);
+      delete("posts/{slug}", appContext.getPostController()::handleDeletePost);
+
+      get("media", appContext.getMediaController()::handleGetMediaIndex);
+      get("media/{uuid}", appContext.getMediaController()::handleGetMedia);
+      post("media", appContext.getMediaController()::handlePostMedia);
+      delete("media/{uuid}", appContext.getMediaController()::handleDeleteMedia);
     });
   }
 }

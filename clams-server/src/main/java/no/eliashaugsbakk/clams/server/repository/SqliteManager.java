@@ -38,27 +38,6 @@ public class SqliteManager implements AutoCloseable {
         );
         """;
 
-    String idxPublished = """
-        CREATE INDEX IF NOT EXISTS idx_posts_published ON posts(published DESC);
-        """;
-
-    String tags = """
-        CREATE TABLE IF NOT EXISTS tags (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL UNIQUE
-        );
-        """;
-
-    String post_tags = """
-        CREATE TABLE IF NOT EXISTS post_tags (
-            post_id INTEGER,
-            tag_id INTEGER,
-            PRIMARY KEY (post_id, tag_id),
-            FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-            FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
-        );
-        """;
-
     String images = """
         CREATE TABLE IF NOT EXISTS images (
             uuid TEXT PRIMARY KEY,
@@ -71,9 +50,6 @@ public class SqliteManager implements AutoCloseable {
     try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
 
       stmt.execute(posts);
-      stmt.execute(idxPublished);
-      stmt.execute(tags);
-      stmt.execute(post_tags);
       stmt.execute(images);
 
     } catch (SQLException e) {

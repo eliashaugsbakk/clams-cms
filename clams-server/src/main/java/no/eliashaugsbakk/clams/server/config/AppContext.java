@@ -9,6 +9,7 @@ import no.eliashaugsbakk.clams.server.repository.BlogPostRepoSqlite;
 import no.eliashaugsbakk.clams.server.repository.MediaRepo;
 import no.eliashaugsbakk.clams.server.repository.MediaRepoSqlite;
 import no.eliashaugsbakk.clams.server.repository.SqliteManager;
+import no.eliashaugsbakk.clams.server.service.AuthService;
 import no.eliashaugsbakk.clams.server.service.SlugService;
 
 public class AppContext implements AutoCloseable {
@@ -16,6 +17,7 @@ public class AppContext implements AutoCloseable {
   private final BlogController blogController;
   private final MediaController mediaController;
   private final PostController postController;
+  private final AuthService authService;
 
   public AppContext() {
     AppConfig appConfig = new AppConfig();
@@ -32,11 +34,13 @@ public class AppContext implements AutoCloseable {
     this.blogController = new BlogController(dbManager);
     this.mediaController = new MediaController(mediaRepo, appConfig);
     this.postController = new PostController(blogPostRepo, slugService);
+    this.authService = new AuthService(appConfig);
   }
 
   public BlogController getBlogController() { return blogController; }
   public MediaController getMediaController() { return mediaController; }
   public PostController getPostController() { return postController; }
+  public AuthService getAuthService() { return authService; }
 
   @Override
   public void close() {

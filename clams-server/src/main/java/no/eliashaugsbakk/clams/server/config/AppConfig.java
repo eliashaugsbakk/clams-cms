@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Properties;
 
 public class AppConfig {
@@ -23,7 +25,7 @@ public class AppConfig {
       properties.load(reader);
       ensureStorageDirectoryExists();
     } catch (IOException e) {
-      System.err.println("Failed to load configuration file: " + e.getMessage());
+      throw new RuntimeException("Failed to read configuration file: " + configPath, e);
     }
   }
 
@@ -43,10 +45,19 @@ public class AppConfig {
     try {
       Files.createDirectories(configPath.getParent());
 
+      byte[] tokenBytes = new byte[32];
+      new SecureRandom().nextBytes(tokenBytes);
+      String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+
       try (BufferedWriter writer = Files.newBufferedWriter(configPath)) {
-        writer.write("storage_location=./data/\n\n");
+        writer.write(String.format("""
+            storage_location=./data/
+            
+            authorization_token=%s
+            """, token));
       }
-      System.out.println("Generated a default configuration file at: " + configPath);
+      IO.println("Generated a default configuration file at: " + configPath);
+      IO.println("Generated authentication token: " + token);
 
     } catch (IOException e) {
       System.err.println("Could not create default config file: " + e.getMessage());
@@ -55,5 +66,15 @@ public class AppConfig {
 
   public String getStorageLocation() {
     return properties.getProperty("storage_location", "./data");
+  }
+
+  public String getAuthToken() {
+    String token = properties.getProperty("authorization_token");
+    if (token == null || token.isBlank()) {
+      System.err.println("CRITICAL: 'authorization_token' is missing or empty in config properties!");
+
+      throw new IllegalStateException("CRITICAL: 'authorization_token' is missing or empty in config properties!");
+    }
+    return token;
   }
 }
