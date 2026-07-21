@@ -1,8 +1,8 @@
 .content-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    margin-top: 30px;
+    gap: 3.8rem;
+    margin-top: 1.8rem;
 }
 
 .left-column { text-align: right; }
@@ -14,15 +14,15 @@
 .profile-img {
     border: 3px solid var(--text-color);
     border-radius: 20px;
-    width: 200px;
+    width: 12.4rem;
     display: block;
     margin-left: auto;
-    margin-bottom: 20px;
+    margin-bottom: 1.2rem;
 }
 
 .description {
     display: block;
-    font-size: 0.9rem;
+    font-size: var(--font-size-small);
     opacity: 0.8;
     white-space: normal;
     overflow: visible;

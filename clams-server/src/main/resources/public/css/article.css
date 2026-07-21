@@ -1,31 +1,37 @@
 .article-header {
     display: flex;
     justify-content: space-between;
-    margin-top: 45px;
-    margin-bottom: 40px;
+    margin-top: 2.8rem;
+    margin-bottom: 2.5rem;
     font-size: 0.9rem;
     opacity: 0.7;
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
+    padding-bottom: 0.6rem;
+}
+
+h1 {
+    text-align: left;
 }
 
 .article-content {
     line-height: 1.8;
-    margin-bottom: 80px;
+    font-size: var(--font-size-body);
+    margin-bottom: 5rem;
 }
 
 .article-content p {
     margin-bottom: 1.5rem;
+    font-size: inherit;
 }
 
 .article-content p:has(img) {
-    margin: 40px 0;
+    margin: 2.4rem 0;
     text-align: center;
 }
 
 .article-content img {
     width: 100%;
-    max-width: 550px;
+    max-width: 34.4rem;
     height: auto;
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -35,8 +41,8 @@
 .article-nav {
     display: flex;
     justify-content: space-between;
-    margin-top: 60px;
-    padding-top: 30px;
+    margin-top: 3.8rem;
+    padding-top: 1.8rem;
     border-top: 1px dashed var(--border-color);
 }
 

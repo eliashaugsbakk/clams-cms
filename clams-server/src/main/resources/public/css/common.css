@@ -6,6 +6,9 @@
     --border-color: #ccc;
     --font-serif: "Spectral", Georgia, serif;
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-size-body: 1.05rem;
+    --font-size-small: 0.9rem;
+    --font-size-caption: 0.85rem;
 }
 
 h1, h2 {
@@ -19,7 +22,7 @@ html {
 html, body {
     height: 100%;
     margin: 0;
-    font-size: 18px;
+    font-size: 1rem;
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-serif), serif;
@@ -33,25 +36,30 @@ body {
 }
 
 .main-container {
-    max-width: 800px;
+    max-width: 50rem;
     width: 90%;
-    padding: 20px;
+    padding: 1.25rem;
     flex: 1;
     position: relative;
 }
 
 h1 {
+    font-size: 1.7rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    line-height: 0;
     text-align: center;
-    margin-top: 40px;
-    margin-bottom: 40px;
-    font-size: 2.5rem;
+}
+
+p, .main-container p {
+    font-size: var(--font-size-body);
 }
 
 h2 {
     font-size: 1.2rem;
     border-bottom: 1px solid var(--border-color);
-    margin-bottom: 20px;
-    padding-bottom: 5px;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.3rem;
     letter-spacing: 1px;
 }
 
@@ -66,8 +74,8 @@ h2 {
 .content-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    margin-top: 30px;
+    gap: 3.75rem;
+    margin-top: 1.875rem;
 }
 
 .left-column { text-align: right; }
@@ -85,10 +93,10 @@ a:hover {
 }
 
 footer {
-    padding: 30px 20px;
+    padding: 1.875rem 1.25rem;
     border-top: 1px solid var(--border-color);
     width: 100%;
-    font-size: 0.9rem;
+    font-size: var(--font-size-small);
 }
 
 footer p {
@@ -101,13 +109,13 @@ footer p {
 .footer-left {
     flex: 1;
     text-align: right;
-    padding-right: 15px;
+    padding-right: 0.9rem;
 }
 
 .footer-right {
     flex: 1;
     text-align: left;
-    padding-left: 15px;
+    padding-left: 0.9rem;
 }
 
 .footer-separator {
@@ -134,7 +142,7 @@ footer p {
 }
 
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 0.6rem;
 }
 
 ::-webkit-scrollbar-track {
@@ -158,9 +166,9 @@ footer p {
 
 .back-link-top {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 0.85rem;
+    top: 1.25rem;
+    left: 1.25rem;
+    font-size: var(--font-size-caption);
     text-decoration: none;
     font-weight: bold;
     opacity: 0.7;
