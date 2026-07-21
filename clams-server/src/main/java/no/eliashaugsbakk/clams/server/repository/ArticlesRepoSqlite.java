@@ -8,25 +8,25 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import no.eliashaugsbakk.clams.server.model.Post;
-import no.eliashaugsbakk.clams.server.model.PostMetaData;
+import no.eliashaugsbakk.clams.server.model.Article;
+import no.eliashaugsbakk.clams.server.model.ArticleMetaData;
 
-public class BlogPostRepoSqlite implements BlogPostRepo {
+public class ArticlesRepoSqlite implements ArticlesRepo {
   private final SqliteManager manager;
 
-  public BlogPostRepoSqlite(SqliteManager manager) {
+  public ArticlesRepoSqlite(SqliteManager manager) {
     this.manager = manager;
   }
 
   @Override
-  public List<PostMetaData> listPostsMetaData() {
+  public List<ArticleMetaData> listArticlesMetaData() {
     String sql = """
         SELECT title, slug, summary, published, last_edited, is_published
-        FROM posts
+        FROM articles
         ORDER BY published DESC
         """;
 
-    List<PostMetaData> posts = new ArrayList<>();
+    List<ArticleMetaData> articles = new ArrayList<>();
 
     try (Connection conn = manager.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql);
@@ -41,21 +41,21 @@ public class BlogPostRepoSqlite implements BlogPostRepo {
         Instant lastEdit = (lastEditRaw != null) ? Instant.parse(lastEditRaw) : null;
         boolean isPublished = resultSet.getBoolean("is_published");
 
-        posts.add(new PostMetaData(title, slug, summary, published, lastEdit, isPublished));
+        articles.add(new ArticleMetaData(title, slug, summary, published, lastEdit, isPublished));
       }
 
-      return posts;
+      return articles;
 
     } catch (SQLException e) {
-      throw new RepoException("Error fetching all post metadata sorted by time", e);
+      throw new RepoException("Error fetching all article metadata sorted by time", e);
     }
   }
 
   @Override
-  public Optional<Post> getPost(String slug) {
+  public Optional<Article> getArticle(String slug) {
     String sql = """
-        SELECT title, slug, summary, content, published, is_published
-        FROM posts
+        SELECT title, slug, summary, content, published, last_edited, is_published
+        FROM articles
         WHERE slug = ?
         """;
 
@@ -67,32 +67,33 @@ public class BlogPostRepoSqlite implements BlogPostRepo {
       try (ResultSet resultSet = stmt.executeQuery()) {
         if (resultSet.next()) {
           String title = resultSet.getString("title");
-          String postSlug = resultSet.getString("slug");
+          String articleSlug = resultSet.getString("slug");
           String summary = resultSet.getString("summary");
           String content = resultSet.getString("content");
           Instant published = Instant.parse(resultSet.getString("published"));
+          Instant lastEdited = Instant.parse(resultSet.getString("last_edited"));
           boolean isPublished = resultSet.getBoolean("is_published");
 
-          return Optional.of(new Post(title, postSlug, summary, published, content, isPublished));
+          return Optional.of(new Article(title, articleSlug, summary, published, lastEdited, content, isPublished));
         }
         return Optional.empty();
       }
 
     } catch (SQLException e) {
-      throw new RepoException("Error fetching full post by slug: " + slug, e);
+      throw new RepoException("Error fetching full article by slug: " + slug, e);
     }
   }
 
   @Override
-  public List<PostMetaData> searchPostsBody(String query) {
+  public List<ArticleMetaData> searchArticlesBody(String query) {
     String sql = """
         SELECT title, slug, summary, published, last_edited, is_published
-        FROM posts
+        FROM articles
         WHERE content LIKE ?
         ORDER BY published DESC
         """;
 
-    List<PostMetaData> posts = new ArrayList<>();
+    List<ArticleMetaData> articles = new ArrayList<>();
 
     try (Connection conn = manager.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -109,45 +110,45 @@ public class BlogPostRepoSqlite implements BlogPostRepo {
           Instant lastEdit = Instant.parse(resultSet.getString("last_edited"));
           boolean isPublished = resultSet.getBoolean("is_published");
 
-          posts.add(new PostMetaData(title, slug, summary, published, lastEdit, isPublished));
+          articles.add(new ArticleMetaData(title, slug, summary, published, lastEdit, isPublished));
         }
       }
 
-      return posts;
+      return articles;
 
     } catch (SQLException e) {
-      throw new RepoException("Error searching posts for query: " + query, e);
+      throw new RepoException("Error searching articles for query: " + query, e);
     }
   }
 
   @Override
-  public void addBlogPost(Post post) {
+  public void addArticle(Article article) {
     String sql = """
-        INSERT INTO posts (slug, title, content, summary, published, is_published)
+        INSERT INTO articles (slug, title, content, summary, published, is_published)
         VALUES (?, ?, ?, ?, ?, ?)
         """;
 
     try (Connection conn = manager.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-      stmt.setString(1, post.slug());
-      stmt.setString(2, post.title());
-      stmt.setString(3, post.content());
-      stmt.setString(4, post.summary());
-      stmt.setString(5, post.timePublished().toString());
-      stmt.setBoolean(6, post.isPublished());
+      stmt.setString(1, article.slug());
+      stmt.setString(2, article.title());
+      stmt.setString(3, article.content());
+      stmt.setString(4, article.summary());
+      stmt.setString(5, article.timePublished().toString());
+      stmt.setBoolean(6, article.isPublished());
 
       stmt.executeUpdate();
 
     } catch (SQLException e) {
-      throw new RepoException("Error adding blog post: " + post.slug(), e);
+      throw new RepoException("Error adding articles article: " + article.slug(), e);
     }
   }
 
   @Override
-  public void updateBlogPost(Post post) {
+  public void updateArticle(Article article) {
     String sql = """
-        UPDATE posts
+        UPDATE articles
         SET title = ?, content = ?, summary = ?, published = ?, last_edited = ?, is_published = ?
         WHERE slug = ?
         """;
@@ -155,25 +156,25 @@ public class BlogPostRepoSqlite implements BlogPostRepo {
     try (Connection conn = manager.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-      stmt.setString(1, post.title());
-      stmt.setString(2, post.content());
-      stmt.setString(3, post.summary());
-      stmt.setString(4, post.timePublished().toString());
+      stmt.setString(1, article.title());
+      stmt.setString(2, article.content());
+      stmt.setString(3, article.summary());
+      stmt.setString(4, article.timePublished().toString());
       stmt.setString(5, Instant.now().toString());
-      stmt.setBoolean(6, post.isPublished());
-      stmt.setString(7, post.slug());
+      stmt.setBoolean(6, article.isPublished());
+      stmt.setString(7, article.slug());
 
       stmt.executeUpdate();
 
     } catch (SQLException e) {
-      throw new RepoException("Error updating blog post: " + post.slug(), e);
+      throw new RepoException("Error updating articles article: " + article.slug(), e);
     }
   }
 
   @Override
-  public void deleteBlogPost(String slug) {
+  public void deleteArticle(String slug) {
     String sql = """
-        DELETE FROM posts
+        DELETE FROM articles
         WHERE slug = ?
         """;
 
@@ -185,15 +186,15 @@ public class BlogPostRepoSqlite implements BlogPostRepo {
       stmt.executeUpdate();
 
     } catch (SQLException e) {
-      throw new RepoException("Error deleting blog post: " + slug, e);
+      throw new RepoException("Error deleting articles article: " + slug, e);
     }
   }
 
   @Override
-  public boolean existsPostBySlug(String slug) {
+  public boolean existsArticleBySlug(String slug) {
     String sql = """
         SELECT 1
-        FROM posts
+        FROM articles
         WHERE slug = ?
         LIMIT 1
         """;
@@ -208,7 +209,7 @@ public class BlogPostRepoSqlite implements BlogPostRepo {
       }
 
     } catch (SQLException e) {
-      throw new RepoException("Error checking existence of post by slug: " + slug, e);
+      throw new RepoException("Error checking existence of article by slug: " + slug, e);
     }
   }
 }

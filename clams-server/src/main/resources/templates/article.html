@@ -1,0 +1,21 @@
+{% extends "templates/layout.html" %}
+
+{% block content %}
+<main class="main-container">
+    <a href="/articles" class="back-link-top">&larr; back</a>
+    <header class="article-header">
+        <span class="article-date">{{ published_date }}</span>
+        <span class="article-author">{{ author }}</span>
+    </header>
+
+    <h1>{{ title }}</h1>
+
+    <article class="article-content">
+        {{ content | raw }}
+    </article>
+
+    <nav class="article-nav">
+        {{ back_to_index | raw }}
+    </nav>
+</main>
+{% endblock %}

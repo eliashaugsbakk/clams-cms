@@ -25,9 +25,9 @@ public class AppRoutes implements EndpointGroup {
     get("/projects", ctx -> ctx.render("templates/projects.html",
         Map.of("page_title", "Projects - Elias Haugsbakk", "page_css", "projects")));
 
-    path("blog", () -> {
-      get(appContext.getBlogController()::handleBlogRequest);
-      get("{slug}", appContext.getBlogController()::handleGetPost);
+    path("articles", () -> {
+      get(appContext.getArticlesController()::handleArticlesRequest);
+      get("{slug}", appContext.getArticlesController()::handleGetArticle);
     });
 
     path("api", () -> {
@@ -50,13 +50,13 @@ public class AppRoutes implements EndpointGroup {
         }
       });
 
-      post("posts", appContext.getPostController()::handlePostPost);
-      put("posts/{slug}", appContext.getPostController()::handlePutPost);
-      delete("posts/{slug}", appContext.getPostController()::handleDeletePost);
+      post("articles", appContext.getArticleController()::handleArticleArticle);
+      put("articles/{slug}", appContext.getArticleController()::handlePutArticle);
+      delete("articles/{slug}", appContext.getArticleController()::handleDeleteArticle);
 
       get("media", appContext.getMediaController()::handleGetMediaIndex);
       get("media/{uuid}", appContext.getMediaController()::handleGetMedia);
-      post("media", appContext.getMediaController()::handlePostMedia);
+      post("media", appContext.getMediaController()::handleArticleMedia);
       delete("media/{uuid}", appContext.getMediaController()::handleDeleteMedia);
     });
   }

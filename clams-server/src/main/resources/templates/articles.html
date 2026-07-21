@@ -4,24 +4,24 @@
 <main class="main-container">
     <a href="/" class="back-link-top">&larr; back</a>
     <header>
-        <h1>Elias Haugsbakk's Blog</h1>
+        <h1>My articles</h1>
         <p class="intro-text">A collection of my writings and thoughts.</p>
 
-        <form action="/blog" method="GET" class="search-form">
-            <input type="text" name="search" value="{{ search_value }}" placeholder="Search posts..."
-                   aria-label="Search blog posts">
+        <form action="/articles" method="GET" class="search-form">
+            <input type="text" name="search" value="{{ search_value }}" placeholder="Search articles..."
+                   aria-label="Search articles">
             <button type="submit">Search</button>
         </form>
     </header>
 
-    <section id="all" class="blog-section">
-        <h2>All Posts</h2>
-        {% for group in posts_by_year %}
+    <section id="all" class="articles-section">
+        <h2>All Articles</h2>
+        {% for group in articles_by_year %}
         <details class="year-accordion" {% if loop.first %}open{% endif %}>
             <summary class="year-toggle">{{ group.key }}</summary>
-            <ul class="post-list">
-                {% for post in group.value %}
-                <li><a href="/blog/{{ post.slug }}">{{ post.title }}</a></li>
+            <ul class="article-list">
+                {% for article in group.value %}
+                <li><a href="/articles/{{ article.slug }}">{{ article.title }}</a></li>
                 {% endfor %}
             </ul>
         </details>

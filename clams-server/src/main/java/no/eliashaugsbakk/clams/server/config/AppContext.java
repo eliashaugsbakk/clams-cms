@@ -1,11 +1,11 @@
 package no.eliashaugsbakk.clams.server.config;
 
 import java.nio.file.Path;
-import no.eliashaugsbakk.clams.server.controller.BlogController;
+import no.eliashaugsbakk.clams.server.controller.ArticlesController;
 import no.eliashaugsbakk.clams.server.controller.MediaController;
-import no.eliashaugsbakk.clams.server.controller.PostController;
-import no.eliashaugsbakk.clams.server.repository.BlogPostRepo;
-import no.eliashaugsbakk.clams.server.repository.BlogPostRepoSqlite;
+import no.eliashaugsbakk.clams.server.controller.ArticleController;
+import no.eliashaugsbakk.clams.server.repository.ArticlesRepo;
+import no.eliashaugsbakk.clams.server.repository.ArticlesRepoSqlite;
 import no.eliashaugsbakk.clams.server.repository.MediaRepo;
 import no.eliashaugsbakk.clams.server.repository.MediaRepoSqlite;
 import no.eliashaugsbakk.clams.server.repository.SqliteManager;
@@ -14,9 +14,9 @@ import no.eliashaugsbakk.clams.server.service.SlugService;
 
 public class AppContext implements AutoCloseable {
   private final SqliteManager dbManager;
-  private final BlogController blogController;
+  private final ArticlesController articlesController;
   private final MediaController mediaController;
-  private final PostController postController;
+  private final ArticleController articleController;
   private final AuthService authService;
 
   public AppContext() {
@@ -27,19 +27,19 @@ public class AppContext implements AutoCloseable {
     this.dbManager = new SqliteManager(dbUrl);
     this.dbManager.init();
 
-    BlogPostRepo blogPostRepo = new BlogPostRepoSqlite(dbManager);
+    ArticlesRepo articlesRepo = new ArticlesRepoSqlite(dbManager);
     MediaRepo mediaRepo = new MediaRepoSqlite(dbManager);
-    SlugService slugService = new SlugService(blogPostRepo);
+    SlugService slugService = new SlugService(articlesRepo);
 
-    this.blogController = new BlogController(dbManager);
+    this.articlesController = new ArticlesController(dbManager);
     this.mediaController = new MediaController(mediaRepo, appConfig);
-    this.postController = new PostController(blogPostRepo, slugService);
+    this.articleController = new ArticleController(articlesRepo, slugService);
     this.authService = new AuthService(appConfig);
   }
 
-  public BlogController getBlogController() { return blogController; }
+  public ArticlesController getArticlesController() { return articlesController; }
   public MediaController getMediaController() { return mediaController; }
-  public PostController getPostController() { return postController; }
+  public ArticleController getArticleController() { return articleController; }
   public AuthService getAuthService() { return authService; }
 
   @Override

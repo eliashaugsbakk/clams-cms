@@ -4,7 +4,7 @@
     margin: 0 auto 30px auto;
 }
 
-.blog-section {
+.articles-section {
     margin-bottom: 60px;
 }
 
@@ -60,17 +60,17 @@
     opacity: 0.7;
 }
 
-.post-list {
+.article-list {
     margin-top: 10px;
     padding-left: 35px !important;
     border-left: 2px solid var(--border-color);
 }
 
-.post-list li {
+.article-list li {
     margin-bottom: 0.8rem;
 }
 
-.post-list a {
+.article-list a {
     font-size: 1rem;
     font-weight: normal;
 }
@@ -125,7 +125,7 @@
     font-style: italic;
 }
 
-.back-to-blog {
+.back-to-articles {
     margin-top: 40px;
     display: inline-block;
 }

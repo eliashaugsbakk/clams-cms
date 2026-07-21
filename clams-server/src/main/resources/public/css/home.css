@@ -29,12 +29,6 @@
     word-wrap: break-word;
 }
 
-.study-line {
-    margin-top: 0.5rem;
-    font-size: 0.95rem;
-    opacity: 0.8;
-}
-
 @media (max-width: 768px) {
     .content-grid {
         grid-template-columns: 1fr;
